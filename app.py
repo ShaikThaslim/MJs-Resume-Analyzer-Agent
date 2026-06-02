@@ -12,7 +12,7 @@ ui.set_page_config(
     layout="centered"
 )
 
-# Streamlit Secrets నుండి కీ ని ఆటోమేటిక్ గా రీడ్ చేయడానికి
+# Streamlit Secrets నుండి కీ Ni ఆటోమేటిక్ గా రీడ్ చేయడానికి
 if "GROQ_API_KEY" in ui.secrets:
     os.environ["GROQ_API_KEY"] = ui.secrets["GROQ_API_KEY"]
 
@@ -252,9 +252,11 @@ if ui.button("ANALYZE RESUME"):
                     agent=interview_coach
                 )
 
+                # FIX: Groq లో ప్రాంప్ట్ క్యాషింగ్ ఎర్రర్ రాకుండా cache=False యాడ్ చేశాను
                 career_crew = Crew(
                     agents=[resume_critic, interview_coach],
-                    tasks=[task_review, task_interview]
+                    tasks=[task_review, task_interview],
+                    cache=False
                 )
                 career_crew.kickoff()
 
