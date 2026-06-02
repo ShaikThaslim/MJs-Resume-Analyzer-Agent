@@ -5,10 +5,21 @@ from pypdf import PdfReader
 import litellm
 
 # ========================================================
-# LITELLM FIX: Groq లో 'cache_breakpoint' ఎర్రర్ రాకుండా నియంత్రణ
+# LITELLM FIX: CrewAI ఫోర్స్ గా పంపే 'cache_breakpoint' ని దారిలోనే ఎగిరేయడానికి హుక్
 # ========================================================
 litellm.drop_params = True
 litellm.enable_prompt_caching = False
+
+# ── 🎯 అల్టిమేట్ ఫిక్స్: ఇది క్రూ-ఏఐ పంపే చండాలపు క్యాష్ హెడర్ ని గ్రోక్ సర్వర్‌కి వెళ్లకుండా ఆపుతుంది ──
+def filter_groq_params(params):
+    if 'messages' in params:
+        for message in params['messages']:
+            if isinstance(message, dict):
+                message.pop('cache_breakpoint', None)
+    params.pop('cache_breakpoint', None)
+    return params
+
+litellm.before_litellm_call_hook = filter_groq_params
 
 # ================================
 # 1. PAGE CONFIGURATION
@@ -19,7 +30,7 @@ ui.set_page_config(
     layout="centered"
 )
 
-# ── కోపైలట్ ఫిక్స్: సెక్యూరిటీ కోసం కీ ని Streamlit Secrets నుండే ఆటోమేటిక్ గా రీడ్ చేస్తున్నాం ──
+# సెక్యూరిటీ కోసం కీ ని Streamlit Secrets నుండే ఆటోమేటిక్ గా రీడ్ చేస్తున్నాం
 if "GROQ_API_KEY" in ui.secrets:
     os.environ["GROQ_API_KEY"] = ui.secrets["GROQ_API_KEY"]
 
@@ -167,10 +178,9 @@ if ui.button("ANALYZE RESUME"):
                     ui.error("❌ PDF నుండి text extract కాలేదు. Image scan PDF కాదు కదా?")
                     ui.stop()
 
-                # ── కోపైలట్ ఫిక్స్: స్టేబుల్ Groq Llama 3 మోడల్ ఆబ్జెక్ట్ ──
-                # ── ఇది ప్రస్తుతం GROQ లో 100% లైవ్ లో ఉన్న పక్కా మోడల్ ──
+                # ── GROQ లో ప్రస్తుతం 100% యాక్టివ్ గా ఉన్న లేటెస్ట్ ల్యామా 3.3 మోడల్ ──
                 groq_llm = LLM(
-                    model="groq/llama-3.1-70b-versatile"
+                    model="groq/llama-3.3-70b-versatile"
                 )
 
                 resume_critic = Agent(
@@ -256,7 +266,6 @@ if ui.button("ANALYZE RESUME"):
                     agent=interview_coach
                 )
 
-                # Crew లెవెల్లో cache=False ని ఉంచాం (కోపైలట్ సజెషన్ ప్రకారం)
                 career_crew = Crew(
                     agents=[resume_critic, interview_coach],
                     tasks=[task_review, task_interview],
