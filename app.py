@@ -1,6 +1,6 @@
 import os
 import streamlit as ui
-from crewai import Agent, Task, Crew, LLM  # 👈 ఇక్కడ LLM ని యాడ్ చేశా
+from crewai import Agent, Task, Crew, LLM
 from pypdf import PdfReader
 import litellm
 
@@ -176,27 +176,23 @@ if ui.button("ANALYZE RESUME"):
                     ui.error("❌ PDF నుండి text extract కాలేదు. Image scan PDF కాదు కదా?")
                     ui.stop()
 
-                # ── FIX: Groq LLM ని కన్ఫిగర్ చేసి cache డిసేబుల్ చేయడం ──
+                # ── FIX: Llama 3.1 క్యాషింగ్ బగ్ రాకుండా Llama 3 స్టేబుల్ మోడల్ ని సెట్ చేసాం ──
                 groq_llm = LLM(
-                    model="groq/llama-3.1-8b-instant",
-                    cache=False  # LLM level లో క్యాషింగ్ నిలిపివేత
+                    model="groq/llama3-8b-8192"
                 )
 
-                # ── FIX: ప్రతీ Agent కి విడివిడిగా cache=False మరియు llm ఆబ్జెక్ట్ ఇచ్చాం ──
                 resume_critic = Agent(
                     role='Expert Resume Critic',
                     goal='Compare resume with JD, identify missing skills, give match percentage score, and provide improvement tips.',
                     backstory='You are a senior technical recruitment manager specializing in screening and auditing engineering resumes.',
-                    llm=groq_llm,
-                    cache=False
+                    llm=groq_llm
                 )
                 
                 interview_coach = Agent(
                     role='Technical Interview Coach',
                     goal='Formulate high-quality technical interview questions with perfect answers based on resume gaps.',
                     backstory='You are an elite engineering interview coach with experience at top global tech firms.',
-                    llm=groq_llm,
-                    cache=False
+                    llm=groq_llm
                 )
 
                 task_review = Task(
@@ -268,6 +264,7 @@ if ui.button("ANALYZE RESUME"):
                     agent=interview_coach
                 )
 
+                # Crew లెవెల్లో cache=False ని అలాగే ఉంచాం
                 career_crew = Crew(
                     agents=[resume_critic, interview_coach],
                     tasks=[task_review, task_interview],
