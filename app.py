@@ -1,6 +1,6 @@
 import os
 import streamlit as ui
-from crewai import Agent, Task, Crew
+from crewai import Agent, Task, Crew, LLM  # 👈 ఇక్కడ LLM ని యాడ్ చేశా
 from pypdf import PdfReader
 import litellm
 
@@ -71,7 +71,7 @@ html, body, [class*="css"] {
     margin: 32px 0 16px 0;
 }
 
-/* ── FIX: Custom IDE Code Block Style (Line Clipping Issues Completely Fixed) ── */
+/* ── FIX: Custom IDE Code Block Style ── */
 div[data-testid="stCodeBlock"] {
     background-color: #020617 !important;
     border: 1px solid #1e293b !important;
@@ -84,7 +84,7 @@ div[data-testid="stCodeBlock"] pre {
     background-color: transparent !important;
     padding: 12px !important;
     margin: 0 !important;
-    line-height: 1.6 !important; /* పర్ఫెక్ట్ లైన్ స్పేసింగ్ కోసం */
+    line-height: 1.6 !important;
 }
 
 div[data-testid="stCodeBlock"] code {
@@ -176,18 +176,27 @@ if ui.button("ANALYZE RESUME"):
                     ui.error("❌ PDF నుండి text extract కాలేదు. Image scan PDF కాదు కదా?")
                     ui.stop()
 
+                # ── FIX: Groq LLM ని కన్ఫిగర్ చేసి cache డిసేబుల్ చేయడం ──
+                groq_llm = LLM(
+                    model="groq/llama-3.1-8b-instant",
+                    cache=False  # LLM level లో క్యాషింగ్ నిలిపివేత
+                )
+
+                # ── FIX: ప్రతీ Agent కి విడివిడిగా cache=False మరియు llm ఆబ్జెక్ట్ ఇచ్చాం ──
                 resume_critic = Agent(
                     role='Expert Resume Critic',
                     goal='Compare resume with JD, identify missing skills, give match percentage score, and provide improvement tips.',
                     backstory='You are a senior technical recruitment manager specializing in screening and auditing engineering resumes.',
-                    llm="groq/llama-3.1-8b-instant"
+                    llm=groq_llm,
+                    cache=False
                 )
                 
                 interview_coach = Agent(
                     role='Technical Interview Coach',
                     goal='Formulate high-quality technical interview questions with perfect answers based on resume gaps.',
                     backstory='You are an elite engineering interview coach with experience at top global tech firms.',
-                    llm="groq/llama-3.1-8b-instant"
+                    llm=groq_llm,
+                    cache=False
                 )
 
                 task_review = Task(
