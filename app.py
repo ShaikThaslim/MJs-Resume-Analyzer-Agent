@@ -140,7 +140,7 @@ div[data-testid="stCodeBlock"] code {
 # ================================
 # 3. UI HEADERS
 # ================================
-ui.markdown('<div class="main-title">📄 AI RESUME ANALYZER AGENT</div>', unsafe_allow_html=True)
+ui.markdown('<div class="main-title">📄 MJs RESUME ANALYZER AGENT</div>', unsafe_allow_html=True)
 ui.markdown('<div class="sub-title">Upload your resume in PDF format and enter the job description to generate an AI evaluation report.</div>', unsafe_allow_html=True)
 ui.divider()
 
@@ -157,7 +157,7 @@ sample_jd = ui.text_area(
 # ================================
 # 5. EXECUTION & AGENT LOGIC
 # ================================
-if ui.button("🚀 ANALYZE RESUME"):
+if ui.button("ANALYZE RESUME"):
     if uploaded_file is not None and sample_jd.strip():
         with ui.spinner("AI Agents are analyzing your profile... Please wait ⏳"):
             try:
@@ -283,7 +283,7 @@ if ui.button("🚀 ANALYZE RESUME"):
 
         ui.markdown('<div class="section-header">📥 DOWNLOAD FULL REPORT</div>', unsafe_allow_html=True)
         ui.download_button(
-            label="📥 Download Interview Prep Report (.md)",
+            label="Download Interview Prep Report",
             data=full_report,
             file_name="Interview_Prep_Report.md",
             mime="text/markdown"
