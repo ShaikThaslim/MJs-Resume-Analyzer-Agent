@@ -2,6 +2,13 @@ import os
 import streamlit as ui
 from crewai import Agent, Task, Crew
 from pypdf import PdfReader
+import litellm
+
+# ========================================================
+# LITELLM FIX: Groq లో 'cache_breakpoint' ఎర్రర్ రాకుండా నియంత్రణ
+# ========================================================
+litellm.drop_params = True
+litellm.enable_prompt_caching = False
 
 # ================================
 # 1. PAGE CONFIGURATION
@@ -252,7 +259,6 @@ if ui.button("ANALYZE RESUME"):
                     agent=interview_coach
                 )
 
-                # FIX: Groq లో ప్రాంప్ట్ క్యాషింగ్ ఎర్రర్ రాకుండా cache=False యాడ్ చేశాను
                 career_crew = Crew(
                     agents=[resume_critic, interview_coach],
                     tasks=[task_review, task_interview],
