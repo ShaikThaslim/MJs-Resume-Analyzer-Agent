@@ -168,9 +168,9 @@ if ui.button("ANALYZE RESUME"):
                     ui.stop()
 
                 # ── కోపైలట్ ఫిక్స్: స్టేబుల్ Groq Llama 3 మోడల్ ఆబ్జెక్ట్ ──
-                # ── FIX: పాత మోడల్ పోయింది కాబట్టి Groq లేటెస్ట్ యాక్టివ్ మోడల్ ని సెట్ చేసాం ──
+                # ── ఇది ప్రస్తుతం GROQ లో 100% లైవ్ లో ఉన్న పక్కా మోడల్ ──
                 groq_llm = LLM(
-                    model="groq/llama3-70b-8192"
+                    model="groq/llama-3.1-70b-versatile"
                 )
 
                 resume_critic = Agent(
