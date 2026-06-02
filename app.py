@@ -19,23 +19,21 @@ ui.set_page_config(
     layout="centered"
 )
 
-# Streamlit Secrets నుండి కీ Ni ఆటోమేటిక్ గా రీడ్ చేయడానికి
+# ── కోపైలట్ ఫిక్స్: సెక్యూరిటీ కోసం కీ ని Streamlit Secrets నుండే ఆటోమేటిక్ గా రీడ్ చేస్తున్నాం ──
 if "GROQ_API_KEY" in ui.secrets:
     os.environ["GROQ_API_KEY"] = ui.secrets["GROQ_API_KEY"]
 
 # ================================
-# 2. APPLICATION STYLING
+# 2. APPLICATION STYLING (నీ ఒరిజినల్ క్రేజీ UI)
 # ================================
 ui.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Fira+Code:wght@400;500;600&display=swap');
 
-/* ── Global Reset & Fonts ── */
 html, body, [class*="css"] {
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-/* ── Background ── */
 .stApp {
     background: #060913;
     background-image: radial-gradient(rgba(0, 242, 254, 0.05) 1px, transparent 0), radial-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 0);
@@ -44,7 +42,6 @@ html, body, [class*="css"] {
     min-height: 100vh;
 }
 
-/* ── Main Title with Gradient ── */
 .main-title {
     font-size: 42px;
     font-weight: 700;
@@ -54,14 +51,12 @@ html, body, [class*="css"] {
     margin-bottom: 4px;
 }
 
-/* ── Subtitle ── */
 .sub-title {
     color: #64748b;
     font-size: 14px;
     margin-bottom: 28px;
 }
 
-/* ── Section Headers ── */
 .section-header {
     font-size: 18px;
     font-weight: 700;
@@ -71,7 +66,6 @@ html, body, [class*="css"] {
     margin: 32px 0 16px 0;
 }
 
-/* ── FIX: Custom IDE Code Block Style ── */
 div[data-testid="stCodeBlock"] {
     background-color: #020617 !important;
     border: 1px solid #1e293b !important;
@@ -95,7 +89,6 @@ div[data-testid="stCodeBlock"] code {
     word-break: normal !important;
 }
 
-/* ── Input Fields ── */
 .stTextArea textarea, .stFileUploader {
     background: #0f172a !important;
     border: 1px solid #334155 !important;
@@ -106,7 +99,6 @@ div[data-testid="stCodeBlock"] code {
     border-color: #00f2fe !important;
 }
 
-/* ── High Contrast Action Buttons ── */
 .stButton > button {
     background: #00f2fe !important;
     color: #020617 !important;
@@ -125,7 +117,6 @@ div[data-testid="stCodeBlock"] code {
     transform: translateY(-1px);
 }
 
-/* ── Download Button ── */
 .stDownloadButton > button {
     background: transparent !important;
     color: #10b981 !important;
@@ -176,7 +167,7 @@ if ui.button("ANALYZE RESUME"):
                     ui.error("❌ PDF నుండి text extract కాలేదు. Image scan PDF కాదు కదా?")
                     ui.stop()
 
-                # ── FIX: Llama 3.1 క్యాషింగ్ బగ్ రాకుండా Llama 3 స్టేబుల్ మోడల్ ని సెట్ చేసాం ──
+                # ── కోపైలట్ ఫిక్స్: స్టేబుల్ Groq Llama 3 మోడల్ ఆబ్జెక్ట్ ──
                 groq_llm = LLM(
                     model="groq/llama3-8b-8192"
                 )
@@ -264,7 +255,7 @@ if ui.button("ANALYZE RESUME"):
                     agent=interview_coach
                 )
 
-                # Crew లెవెల్లో cache=False ని అలాగే ఉంచాం
+                # Crew లెవెల్లో cache=False ని ఉంచాం (కోపైలట్ సజెషన్ ప్రకారం)
                 career_crew = Crew(
                     agents=[resume_critic, interview_coach],
                     tasks=[task_review, task_interview],
@@ -274,7 +265,7 @@ if ui.button("ANALYZE RESUME"):
 
                 review_output    = career_crew.tasks[0].output.raw
                 interview_output = career_crew.tasks[1].output.raw
-                full_report      = f"# 🎯 AI Resume Analyzer Report\n\n## 📋 Resume Review\n\n{review_output}\n\n---\n\n## 💡 Interview Questions & Answers\n\n{interview_output}"
+                full_report      = f"# AI Resume Analyzer Report\n\n## 📋 Resume Review\n\n{review_output}\n\n---\n\n## 💡 Interview Questions & Answers\n\n{interview_output}"
 
             except Exception as e:
                 ui.error(f"❌ Error during execution: {e}")
@@ -297,7 +288,7 @@ if ui.button("ANALYZE RESUME"):
 
         ui.markdown('<div class="section-header">📥 DOWNLOAD FULL REPORT</div>', unsafe_allow_html=True)
         ui.download_button(
-            label="Download Interview Prep Report",
+            label="Download Interview Prep Report (.md)",
             data=full_report,
             file_name="Interview_Prep_Report.md",
             mime="text/markdown"
